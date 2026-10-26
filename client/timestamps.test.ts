@@ -18,7 +18,6 @@ describe("message transforms", () => {
       items: [
         {
           type: "plugin",
-          id: "client-1",
           kind: "timestamped-message",
           version: 1,
           data: { text: "Keep **this** exactly\n", phase: "complete" },
@@ -40,7 +39,6 @@ describe("message transforms", () => {
     expect(result?.items).toEqual([
       {
         type: "plugin",
-        id: "assistant-1",
         kind: "timestamped-assistant-message",
         version: 1,
         data: { text: "First chunk, then the full reply", phase: "streaming" },
@@ -75,5 +73,31 @@ describe("timestamp formatting", () => {
   it("omits invalid timestamps", () => {
     expect(formatTimestamp(new Date("invalid"), shortUtc)).toBeNull();
     expect(formatTimestampAccessibilityLabel(new Date("invalid"), fullUtc)).toBeNull();
+  });
+});
+
+
+describe("history and streaming boundaries", () => {
+  it("lets Paseo derive identity from the source row rather than changing message IDs", () => {
+    const live = transformAssistantMessage({ item: { text: "First\n\nSecond", clientMessageId: "local" }, phase: "streaming" });
+    const done = transformAssistantMessage({ item: { text: "First\n\nSecond", messageId: "saved" }, phase: "complete" });
+    expect(live?.items[0]).not.toHaveProperty("id");
+    expect(done?.items[0]).not.toHaveProperty("id");
+    expect(done?.items[0].data).toEqual({ text: "First\n\nSecond", phase: "complete" });
+  });
+  it("leaves empty attachment-only messages native", () => {
+    expect(transformUserMessage({ item: { text: "" }, phase: "complete" })).toBeUndefined();
+    expect(transformAssistantMessage({ item: { text: "  " }, phase: "streaming" })).toBeUndefined();
+  });
+  it("rejects malformed renderer payloads", () => {
+    expect(messageTimestampSchema.safeParse({ text: 1, phase: "complete" }).success).toBe(false);
+    expect(messageTimestampSchema.safeParse({ text: "x", phase: "loading" }).success).toBe(false);
+  });
+  it("uses the selected timezone across a date boundary", () => {
+    const date = new Date("2026-10-26T00:30:00Z");
+    const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Los_Angeles", dateStyle: "full", timeStyle: "short" });
+    const label = formatTimestampAccessibilityLabel(date, formatter);
+    expect(label).toContain("25 October 2026");
+    expect(label).toContain("17:30");
   });
 });

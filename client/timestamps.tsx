@@ -3,79 +3,58 @@ import { useRevealedText } from "@getpaseo/plugin/client/react-native";
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 import type { z } from "zod";
-import {
-  formatTimestamp,
-  formatTimestampAccessibilityLabel,
-  messageTimestampSchema,
-} from "./timestamp-model";
+import { formatTimestamp, formatTimestampAccessibilityLabel, messageTimestampSchema } from "./timestamp-model";
 
-export {
-  formatTimestamp,
-  formatTimestampAccessibilityLabel,
-  messageTimestampSchema,
-  transformAssistantMessage,
-  transformUserMessage,
-} from "./timestamp-model";
+export { messageTimestampSchema, transformAssistantMessage, transformUserMessage } from "./timestamp-model";
 
-type MessageTimestampData = z.output<typeof messageTimestampSchema>;
+type MessageData = z.output<typeof messageTimestampSchema>;
+type MessageProps = PluginTimelineItemProps<MessageData>;
 
-function MessageTimestamp({ timestamp, theme }: Pick<PluginTimelineItemProps<MessageTimestampData>, "timestamp" | "theme">) {
+function MessageFrame({ children, timestamp, theme, compact, role }: {
+  children: ReactNode;
+  timestamp: Date;
+  theme: MessageProps["theme"];
+  compact: boolean;
+  role: "You" | "Assistant";
+}) {
   const time = formatTimestamp(timestamp);
   const fullDate = formatTimestampAccessibilityLabel(timestamp);
-
-  if (!time || !fullDate) return null;
-
+  const isUser = role === "You";
   return (
-    <Text accessibilityLabel={fullDate} style={{ color: theme.colors.foregroundMuted, fontSize: 12 }}>
-      {time}
-    </Text>
-  );
-}
-
-function MessageFrame({
-  children,
-  timestamp,
-  theme,
-  compact,
-}: Pick<PluginTimelineItemProps<MessageTimestampData>, "timestamp" | "theme"> & {
-  children: ReactNode;
-  compact: boolean;
-}) {
-  return (
-    <View
-      style={{
-        gap: compact ? 4 : 6,
-        paddingVertical: compact ? 4 : 6,
-        paddingHorizontal: compact ? 8 : 10,
-        borderLeftWidth: 2,
-        borderLeftColor: theme.colors.border,
-        backgroundColor: theme.colors.surface1,
-      }}
-    >
-      {children}
-      <MessageTimestamp timestamp={timestamp} theme={theme} />
+    <View style={{ alignItems: isUser ? "flex-end" : "flex-start", paddingVertical: compact ? 6 : 8 }}>
+      <View style={{
+        maxWidth: isUser ? "92%" : "100%",
+        gap: compact ? 6 : 8,
+        paddingVertical: compact ? 10 : 12,
+        paddingHorizontal: compact ? 12 : 16,
+        borderRadius: 12,
+        backgroundColor: isUser ? theme.colors.surface1 : theme.colors.surface0,
+      }}>
+        {children}
+        <Text
+          accessibilityLabel={fullDate ? `${role}, ${fullDate}` : role}
+          style={{ color: theme.colors.foregroundMuted, fontSize: 11, lineHeight: 16, textAlign: isUser ? "right" : "left" }}
+        >
+          {role}{time ? ` · ${time}` : ""}
+        </Text>
+      </View>
     </View>
   );
 }
 
-export function userMessageRenderer({ item, timestamp, theme, layout }: PluginTimelineItemProps<MessageTimestampData>) {
+export function UserMessage({ item, timestamp, theme, layout }: MessageProps) {
   return (
-    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact}>
-      <Text selectable style={{ color: theme.colors.foreground }}>
-        {item.data.text}
-      </Text>
+    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact} role="You">
+      <Text selectable style={{ color: theme.colors.foreground, fontSize: 15, lineHeight: 23 }}>{item.data.text}</Text>
     </MessageFrame>
   );
 }
 
-export function assistantMessageRenderer({ item, timestamp, theme, layout }: PluginTimelineItemProps<MessageTimestampData>) {
+export function AssistantMessage({ item, timestamp, theme, layout }: MessageProps) {
   const text = useRevealedText(item.data.text, item.data.phase);
-
   return (
-    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact}>
-      <Text selectable style={{ color: theme.colors.foreground }}>
-        {text}
-      </Text>
+    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact} role="Assistant">
+      <Text selectable style={{ color: theme.colors.foreground, fontSize: 15, lineHeight: 23 }}>{text}</Text>
     </MessageFrame>
   );
 }

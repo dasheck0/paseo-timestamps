@@ -17,13 +17,12 @@ function isEncodedAttachmentText(text: string) {
 }
 
 function transformMessage(item: MessageItem, phase: MessagePhase, kind: string) {
-  if (isEncodedAttachmentText(item.text)) return undefined;
+  if (!item.text.trim() || isEncodedAttachmentText(item.text)) return undefined;
 
   return {
     items: [
       {
         type: "plugin" as const,
-        ...(item.messageId ?? item.clientMessageId ? { id: item.messageId ?? item.clientMessageId } : {}),
         kind,
         version: 1,
         data: { text: item.text, phase },

@@ -18,7 +18,8 @@
     "LICENSE",
     "index.client.tsx",
     "client/timestamp-model.ts",
-    "client/timestamps.tsx"
+    "client/timestamps.tsx",
+    "assets/"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -32,7 +33,10 @@
     "react": "19.1.0",
     "react-native": "0.81.5",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.12",
     "zod": "^4.4.3"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

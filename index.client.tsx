@@ -1,34 +1,33 @@
 import type { PluginClientContext } from "@getpaseo/plugin/client";
 import {
-  assistantMessageRenderer,
+  AssistantMessage,
   messageTimestampSchema,
   transformAssistantMessage,
   transformUserMessage,
-  userMessageRenderer,
+  UserMessage,
 } from "./client/timestamps";
 
 export default function contribute(client: PluginClientContext) {
-  client.addTimelineTransformer({
+  const removers = [client.addTimelineTransformer({
     id: "timestamp-user-message",
     query: { itemType: "user_message" },
     transform: transformUserMessage,
-  });
-  client.addTimelineTransformer({
+  }), client.addTimelineTransformer({
     id: "timestamp-assistant-message",
     query: { itemType: "assistant_message" },
     transform: transformAssistantMessage,
-  });
-  client.addTimelineRenderer({
+  }), client.addTimelineRenderer({
     kind: "timestamped-message",
     version: 1,
     schema: messageTimestampSchema,
-    Component: userMessageRenderer,
-  });
-  client.addTimelineRenderer({
+    Component: UserMessage,
+  }), client.addTimelineRenderer({
     kind: "timestamped-assistant-message",
     version: 1,
     schema: messageTimestampSchema,
-    Component: assistantMessageRenderer,
-  });
-  return () => {};
+    Component: AssistantMessage,
+  })];
+  return async () => {
+    for (const remove of [...removers].reverse()) await remove();
+  };
 }

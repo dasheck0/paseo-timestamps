@@ -4,5 +4,6 @@
   "media": [],
   "requirements": {
     "paseo": ">=0.12.0"
-  }
+  },
+  "description": "Local timestamps for user and assistant messages, with a compact native text layout."
 }
