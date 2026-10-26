@@ -11,7 +11,7 @@ Small timestamps for user and assistant messages. Local time, readable text, and
 Requires **Paseo 0.12.0 or later** on both the daemon and client, with plugins enabled.
 
 ```sh
-paseo plugin install git:dasheck0/paseo-timestamps --ref v0.1.0
+paseo plugin install git:dasheck0/paseo-timestamps --ref v0.1.1
 ```
 
 This installs directly from GitHub. The plugin is not listed in Paseo's registry. To remove it: `paseo plugin remove paseo-timestamps`.

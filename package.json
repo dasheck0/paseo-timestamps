@@ -1,6 +1,6 @@
 {
   "name": "@dasheck0/paseo-timestamps",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compact, local timestamps for Paseo user and assistant timeline messages.",
   "license": "MIT",
   "repository": {
