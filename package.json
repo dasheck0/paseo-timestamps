@@ -1,6 +1,6 @@
 {
   "name": "@dasheck0/paseo-timestamps",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compact, local timestamps for Paseo user and assistant timeline messages.",
   "license": "MIT",
   "repository": {
@@ -19,7 +19,8 @@
     "index.client.tsx",
     "client/timestamp-model.ts",
     "client/timestamps.tsx",
-    "assets/"
+    "assets/",
+    "docs/"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -38,5 +39,6 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "packageManager": "npm@11.13.0"
 }
