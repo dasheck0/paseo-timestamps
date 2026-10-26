@@ -1,19 +1,33 @@
-import type { PluginClientContext, PluginSidebarItemProps } from "@getpaseo/plugin/client";
-import { SidebarRow } from "@getpaseo/plugin/client/ui";
-import { GreetingScreen } from "./client/greeting";
-
-function GreetingItem({ currentScreen, openScreen }: PluginSidebarItemProps) {
-  return (
-    <SidebarRow
-      icon="MessageCircle"
-      active={currentScreen?.screenId === "greeting"}
-      onPress={() => openScreen({ screenId: "greeting" })}
-    />
-  );
-}
+import type { PluginClientContext } from "@getpaseo/plugin/client";
+import {
+  AssistantMessage,
+  messageTimestampSchema,
+  transformAssistantMessage,
+  transformUserMessage,
+  UserMessage,
+} from "./client/timestamps";
 
 export default function contribute(client: PluginClientContext) {
-  client.addScreen({ id: "greeting", title: "Greeting", Component: GreetingScreen });
-  client.addSidebarHeaderItem({ id: "greeting", title: "Greeting", Component: GreetingItem });
-  return () => {};
+  const removers = [client.addTimelineTransformer({
+    id: "timestamp-user-message",
+    query: { itemType: "user_message" },
+    transform: transformUserMessage,
+  }), client.addTimelineTransformer({
+    id: "timestamp-assistant-message",
+    query: { itemType: "assistant_message" },
+    transform: transformAssistantMessage,
+  }), client.addTimelineRenderer({
+    kind: "timestamped-message",
+    version: 1,
+    schema: messageTimestampSchema,
+    Component: UserMessage,
+  }), client.addTimelineRenderer({
+    kind: "timestamped-assistant-message",
+    version: 1,
+    schema: messageTimestampSchema,
+    Component: AssistantMessage,
+  })];
+  return async () => {
+    for (const remove of [...removers].reverse()) await remove();
+  };
 }
