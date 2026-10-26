@@ -18,7 +18,7 @@ This installs directly from GitHub. The plugin is not listed in Paseo's registry
 
 ## What you get
 
-- A subtle local-time label below each text message, with the full date available to assistive technology.
+- A subtle local date-and-time label below each text message, with the full date available to assistive technology.
 - User bubbles aligned right and assistant replies aligned left, in light, dark, and compact layouts.
 - Original message text and Paseo's paced assistant streaming. History uses the message timestamp supplied by Paseo; invalid dates show no time.
 
@@ -34,7 +34,7 @@ The first matching timeline transformer wins. If another plugin, including Chat 
 
 ## Development
 
-Node 22 or later:
+Node 22.19.0 and npm 11.13.0 (the same versions used in CI):
 
 ```sh
 npm ci --ignore-scripts
