@@ -1,12 +1,14 @@
 # Paseo Timestamps
 
+> **Experimental prototype, not a completed native-footer plugin.** Paseo 0.12's public plugin API requires replacing message rows. This changes native Markdown, message styling, actions and attachment previews. It cannot meet a requirement to leave original messages and custom user styles untouched. The local test installation has been disabled. See [feasibility and required upstream support](docs/feasibility.md).
+
 Small timestamps for user and assistant messages. Local time, readable text, and room to breathe.
 
 ![Illustrative light and dark preview](assets/preview.svg)
 
 *Illustrative preview with sample messages. Colors follow your Paseo theme.*
 
-## Install
+## Try the experimental renderer
 
 Requires **Paseo 0.12.0 or later** on both the daemon and client, with plugins enabled.
 

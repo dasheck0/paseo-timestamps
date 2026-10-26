@@ -1,3 +1,5 @@
+Experimental prototype. This implementation replaces native message rendering and cannot preserve existing message styles, Markdown, actions and mixed attachment previews. It is not suitable when only a timestamp footer may be added.
+
 Paseo Timestamps adds small local-time labels to user and assistant text messages. User bubbles sit on the right and assistant replies on the left, using the current theme and compact layout. The full date is available to assistive technology.
 
 Requires Paseo 0.12.0 or later on the daemon and client, with plugins enabled. It uses Paseo's source timestamps and assistant text reveal hook. Invalid dates show no time. The client contribution makes no additional network requests and has no backend or account setup; Paseo's normal provider traffic is unchanged.
