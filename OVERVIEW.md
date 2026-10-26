@@ -1,26 +1,7 @@
-<!--
-OVERVIEW.md is required to list your plugin in the registry. Keep it beside
-paseo-plugin.json in your repository at the pinned commit and in your npm package.
-Replace this comment with useful facts before publishing.
+Paseo Timestamps adds small local-time labels to user and assistant text messages. User bubbles sit on the right and assistant replies on the left, using the current theme and compact layout. The full date is available to assistive technology.
 
-This overview is for people choosing a plugin in Paseo, on the plugin page under
-its install command. README assumes a GitHub audience and includes technical
-details, installation instructions, and badges. Long, AI-generated READMEs leave
-people reading past that material to understand what the plugin does.
+Requires Paseo 0.12.0 or later on the daemon and client, with plugins enabled. It uses Paseo's source timestamps and assistant text reveal hook. Invalid dates show no time. The client contribution makes no additional network requests and has no backend or account setup; Paseo's normal provider traffic is unchanged.
 
-Write these parts in order, including only what helps someone decide to install:
+The timeline API requires replacing native message rows. This version displays Markdown as source text and does not retain native row actions. Empty messages and standalone base64 data payloads stay native. Mixed text-and-attachment messages may lose their native attachment preview because that metadata is unavailable to the transformer. Removing the plugin restores native rendering without changing history.
 
-1. Describe what your plugin is and does in plain terms first.
-2. Explain how it works only when it is not obvious.
-3. Explain setup when needed: settings, accounts, tokens, providers, tools, or
-   other plugins. Include applicable daemon version and operating system
-   requirements. Setup guidance is allowed; installation instructions are not.
-4. Explain capabilities and settings worth understanding, what each option does,
-   what the plugin reads or sends and where, permissions, and known limits.
-
-Length follows complexity; a theme needs one paragraph. Choose headings only
-when they help. Use sentence case and plain factual language, with no em dashes.
-Omit installation commands, badges, changelog, contributing or license sections,
-marketing, and unsupported claims. Avoid implementation filler such as empty
-cleanup functions, theme-token field lists, or lists of absent features.
--->
+Other plugins that transform the same message types can take precedence. Disable their overlapping renderer to use these timestamped rows.
