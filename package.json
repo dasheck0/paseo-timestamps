@@ -1,28 +1,38 @@
 {
-  "name": "paseo-timestamps",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@dasheck0/paseo-timestamps",
+  "version": "0.1.0",
+  "description": "Compact, local timestamps for Paseo user and assistant timeline messages.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dasheck0/paseo-timestamps.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dasheck0/paseo-timestamps/issues"
+  },
+  "homepage": "https://github.com/dasheck0/paseo-timestamps#readme",
   "files": [
     "paseo-plugin.json",
     "OVERVIEW.md",
-    "index.client.ts",
+    "README.md",
+    "LICENSE",
     "index.client.tsx",
-    "index.server.ts",
-    "index.server.tsx",
-    "client/",
-    "server/",
-    "shared/"
+    "client/timestamp-model.ts",
+    "client/timestamps.tsx"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
+    "@getpaseo/client": "0.12.0",
     "@getpaseo/plugin": "0.12.0",
-    "@tanstack/react-query": "^5.90.11",
+    "@getpaseo/protocol": "0.12.0",
     "@types/react": "~19.2.0",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
     "zod": "^4.4.3"
   }
 }
