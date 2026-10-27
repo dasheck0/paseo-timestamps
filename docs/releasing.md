@@ -41,9 +41,9 @@ Use an unpatched Paseo client and daemon, with other message-transforming plugin
 - Verify today/yesterday labels and older dates in at least two locales and around a local calendar boundary.
 - Exercise attachments and confirm the documented preview limitations are acceptable. Do not claim native action or custom-style parity.
 - Remove the plugin and verify native rendering returns with unchanged history.
-- Label illustrative artwork accurately; only label real captures as screenshots.
+- Use current interface screenshots with sample data and no private information for the plugin listing.
 
-The automated renderer tests mock host components. They do not certify device behavior. Earlier browser tests of a separate patched host footer do not certify this public replacement renderer.
+The automated renderer tests mock host components. They do not certify device behavior; test the release in the official Paseo client before publishing.
 
 ## 4. Publish only after approval
 

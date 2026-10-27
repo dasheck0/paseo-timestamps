@@ -24,7 +24,7 @@ const allowed = new Set([
   "package.json", "paseo-plugin.json", "README.md", "OVERVIEW.md", "LICENSE", "CHANGELOG.md",
   "index.client.tsx", "client/transform.ts", "client/message-schema.ts",
   "client/timestamp-model.ts", "client/timestamps.tsx",
-  "assets/logo.png", "assets/preview.svg", "docs/feasibility.md", "docs/releasing.md",
+  "assets/logo.png", "docs/compatibility.md", "docs/releasing.md",
 ]);
 for (const file of pkg.files) assert(allowed.has(file), `Unreviewed package.files entry: ${file}`);
 const [pack] = JSON.parse(execFileSync("npm", ["pack", "--dry-run", "--ignore-scripts", "--json"], {
