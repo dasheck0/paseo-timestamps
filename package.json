@@ -1,7 +1,7 @@
 {
   "name": "@dasheck0/paseo-timestamps",
   "version": "1.0.0",
-  "description": "Compact, local timestamps for Paseo user and assistant timeline messages.",
+  "description": "Localized dates and timestamps for Paseo user and assistant messages.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,8 +23,7 @@
     "client/timestamp-model.ts",
     "client/timestamps.tsx",
     "assets/logo.png",
-    "assets/preview.svg",
-    "docs/feasibility.md",
+    "docs/compatibility.md",
     "docs/releasing.md"
   ],
   "scripts": {

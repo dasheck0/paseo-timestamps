@@ -6,11 +6,7 @@
 
 Small timestamps. Local dates. A clearer conversation.
 
-Adds local date and time labels to user and assistant messages, with rendered assistant Markdown and colors from your Paseo theme. No account, backend, or patched client required.
-
-![Illustrative light and dark preview](assets/preview.svg)
-
-*Illustrative layout, not a product screenshot. Colors follow your Paseo theme.*
+Adds local date and time labels to user and assistant messages, with rendered assistant Markdown and colors from your Paseo theme. No account or additional service required.
 
 ## Install
 
@@ -39,7 +35,7 @@ paseo plugin remove paseo-timestamps
 
 Attachment-bearing or special messages stay native when recognizable. **Paseo can omit attachment metadata from the transformer input, so mixed text-and-attachment messages can lose their previews.** If attachments or complete native feature parity are essential, do not enable this renderer. Removing it restores native rendering without rewriting message history.
 
-Other plugins that transform the same messages can take precedence. This plugin does not change their settings. See [API constraints](docs/feasibility.md) for details.
+Other plugins that transform the same messages can take precedence. This plugin does not change their settings. See [compatibility](docs/compatibility.md) for details.
 
 Client-only: no backend, credentials, analytics, or additional network requests.
 
@@ -58,7 +54,7 @@ Node 22+ is required for development. `build` compiles the client TypeScript; Pa
 
 Local installation: `paseo plugin install /path/to/paseo-timestamps`.
 
-See [release preparation](docs/releasing.md) and the [changelog](CHANGELOG.md).
+See [compatibility](docs/compatibility.md), [release preparation](docs/releasing.md), and the [changelog](CHANGELOG.md).
 
 ## License
 
