@@ -1,9 +1,5 @@
-Experimental prototype. This implementation replaces native message rendering and cannot preserve existing message styles, Markdown, actions and mixed attachment previews. It is not suitable when only a timestamp footer may be added.
+Paseo Timestamps displays a localized date and time with user and assistant messages. It uses Paseo's public timeline transformer and Markdown renderer APIs (SDK 0.13.2+), not a custom host extension.
 
-Paseo Timestamps adds small local-time labels to user and assistant text messages. User bubbles sit on the right and assistant replies on the left, using the current theme and compact layout. The full date is available to assistive technology.
+Because the public SDK does not expose native user/assistant message components, the plugin replaces those message rows. User text stays plain and selectable in a theme-colored bubble; assistant text is passed unchanged to Paseo's themed Markdown component. Dates use local calendar time, with localized today/yesterday labels and a medium date otherwise. Invalid timestamps do not hide message content.
 
-Requires Paseo 0.12.0 or later on the daemon and client, with plugins enabled. It uses Paseo's source timestamps and assistant text reveal hook. Invalid dates show no time. The client contribution makes no additional network requests and has no backend or account setup; Paseo's normal provider traffic is unchanged.
-
-The timeline API requires replacing native message rows. This version displays Markdown as source text and does not retain native row actions. Empty messages and standalone base64 data payloads stay native. Mixed text-and-attachment messages may lose their native attachment preview because that metadata is unavailable to the transformer. Removing the plugin restores native rendering without changing history.
-
-Other plugins that transform the same message types can take precedence. Disable their overlapping renderer to use these timestamped rows.
+This replacement does not guarantee parity with every native message feature: native actions, attachments, special content, layout details, and assistant streaming presentation may differ. Attachment metadata unavailable to the public transformer cannot be reproduced. No backend, credentials, analytics, or additional network requests are used.
