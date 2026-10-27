@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" width="200" alt="Paseo Timestamps logo">
+</p>
+
 # Paseo Timestamps
 
 Localized timestamps alongside Paseo user and assistant messages.
