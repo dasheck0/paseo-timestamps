@@ -23,6 +23,7 @@
     "client/timestamp-model.ts",
     "client/timestamps.tsx",
     "assets/logo.png",
+    "assets/preview.svg",
     "docs/compatibility.md",
     "docs/releasing.md"
   ],
