@@ -5,6 +5,6 @@
   "requirements": {
     "paseo": ">=0.13.2"
   },
-  "description": "Localized timestamps alongside user and assistant messages."
+  "description": "Localized timestamps alongside user and assistant messages.",
   "icon": "assets/logo.png"
 }
