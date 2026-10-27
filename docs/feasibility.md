@@ -1,6 +1,8 @@
 # Native timestamp footers: feasibility
 
-**Status: blocked by the public plugin API. The repository contains a working replacement-renderer prototype, not the requested solution that preserves native messages.**
+**Current scope: public SDK 0.13.2 replacement rendering, explicitly accepted as a trade-off. Exact native-message preservation remains blocked by the public API.**
+
+The current version renders assistant content through the public host Markdown component and user content as selectable plain text in a theme-colored bubble. It requires no client patch. Native actions, attachment previews and exact styles are not guaranteed. Lint, TypeScript compilation, typecheck and 13 tests pass. The notes below describe the earlier SDK 0.12 investigation, not the current dependency versions or runtime installation status.
 
 The intended behavior is to keep Paseo's original user and assistant message rendering, custom styles, Markdown, attachments and actions intact, adding only a localized date and time below it. Dates should use the user's locale and local calendar: today, yesterday, or a formatted date.
 

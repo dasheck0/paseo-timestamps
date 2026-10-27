@@ -1,60 +1,36 @@
-import type { PluginTimelineItemProps } from "@getpaseo/plugin/client";
+import { View, Text } from "react-native";
+import { Markdown } from "@getpaseo/plugin/client/ui";
 import { useRevealedText } from "@getpaseo/plugin/client/react-native";
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
-import type { z } from "zod";
-import { formatTimestamp, formatTimestampAccessibilityLabel, messageTimestampSchema } from "./timestamp-model";
+import type { PluginTimelineItemProps } from "@getpaseo/plugin/client";
+import { z } from "zod";
+import { formatMessageDate, formatTimestamp, formatTimestampAccessibilityLabel } from "./timestamp-model";
 
-export { messageTimestampSchema, transformAssistantMessage, transformUserMessage } from "./timestamp-model";
+export const messageReplacementSchema = z.object({ role: z.enum(["user", "assistant"]), text: z.string(), phase: z.enum(["streaming", "complete"]) });
+export type MessageReplacementData = z.infer<typeof messageReplacementSchema>;
 
-type MessageData = z.output<typeof messageTimestampSchema>;
-type MessageProps = PluginTimelineItemProps<MessageData>;
-
-function MessageFrame({ children, timestamp, theme, compact, role }: {
-  children: ReactNode;
-  timestamp: Date;
-  theme: MessageProps["theme"];
-  compact: boolean;
-  role: "You" | "Assistant";
-}) {
+export function MessageReplacement({ item, timestamp, theme }: PluginTimelineItemProps<MessageReplacementData>) {
+  const date = formatMessageDate(timestamp);
   const time = formatTimestamp(timestamp);
   const fullDate = formatTimestampAccessibilityLabel(timestamp);
-  const isUser = role === "You";
+  if (!date || !time || !fullDate) return <Body data={item.data} theme={theme} />;
+
   return (
-    <View style={{ alignItems: isUser ? "flex-end" : "flex-start", paddingVertical: compact ? 6 : 8 }}>
-      <View style={{
-        maxWidth: isUser ? "92%" : "100%",
-        gap: compact ? 6 : 8,
-        paddingVertical: compact ? 10 : 12,
-        paddingHorizontal: compact ? 12 : 16,
-        borderRadius: 12,
-        backgroundColor: isUser ? theme.colors.surface1 : theme.colors.surface0,
-      }}>
-        {children}
-        <Text
-          accessibilityLabel={fullDate ? `${role}, ${fullDate}` : role}
-          style={{ color: theme.colors.foregroundMuted, fontSize: 11, lineHeight: 16, textAlign: isUser ? "right" : "left" }}
-        >
-          {role}{time ? ` · ${time}` : ""}
-        </Text>
-      </View>
+    <View style={{ gap: 4 }}>
+      <Body data={item.data} theme={theme} />
+      <Text accessibilityLabel={fullDate} style={{ color: theme.colors.foregroundMuted, fontSize: 11, lineHeight: 16, textAlign: item.data.role === "user" ? "right" : "left" }}>{date} · {time}</Text>
     </View>
   );
 }
 
-export function UserMessage({ item, timestamp, theme, layout }: MessageProps) {
-  return (
-    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact} role="You">
-      <Text selectable style={{ color: theme.colors.foreground, fontSize: 15, lineHeight: 23 }}>{item.data.text}</Text>
-    </MessageFrame>
-  );
+function Body({ data, theme }: { data: MessageReplacementData; theme: PluginTimelineItemProps["theme"] }) {
+  return data.role === "user" ? <UserBody text={data.text} theme={theme} /> : <AssistantBody text={data.text} phase={data.phase} />;
 }
 
-export function AssistantMessage({ item, timestamp, theme, layout }: MessageProps) {
-  const text = useRevealedText(item.data.text, item.data.phase);
-  return (
-    <MessageFrame timestamp={timestamp} theme={theme} compact={layout.compact} role="Assistant">
-      <Text selectable style={{ color: theme.colors.foreground, fontSize: 15, lineHeight: 23 }}>{text}</Text>
-    </MessageFrame>
-  );
+export function UserBody({ text, theme }: { text: string; theme: PluginTimelineItemProps["theme"] }) {
+  return <View style={{ flexDirection: "row", justifyContent: "flex-end", marginBottom: 4 }}><View style={{ maxWidth: "100%", backgroundColor: theme.colors.surface2, borderRadius: 16, borderTopRightRadius: 6, paddingHorizontal: 16, paddingVertical: 16, flexShrink: 1 }}><Text selectable style={{ color: theme.colors.foreground, fontSize: 16, lineHeight: 22 }}>{text}</Text></View></View>;
+}
+
+export function AssistantBody({ text, phase }: { text: string; phase: "streaming" | "complete" }) {
+  const revealed = useRevealedText(text, phase);
+  return <Markdown>{revealed}</Markdown>;
 }

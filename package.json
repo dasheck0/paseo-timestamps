@@ -17,23 +17,29 @@
     "README.md",
     "LICENSE",
     "index.client.tsx",
+    "client/transform.ts",
     "client/timestamp-model.ts",
     "client/timestamps.tsx",
     "assets/",
     "docs/"
   ],
   "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
-    "@getpaseo/client": "0.12.0",
-    "@getpaseo/plugin": "0.12.0",
-    "@getpaseo/protocol": "0.12.0",
+    "@getpaseo/client": "0.13.2",
+    "@getpaseo/plugin": "0.13.2",
+    "@getpaseo/protocol": "0.13.2",
     "@types/react": "~19.2.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^4.1.12",
     "zod": "^4.4.3"
   },

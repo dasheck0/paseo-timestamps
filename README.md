@@ -1,51 +1,39 @@
 # Paseo Timestamps
 
-> **Experimental prototype, not a completed native-footer plugin.** Paseo 0.12's public plugin API requires replacing message rows. This changes native Markdown, message styling, actions and attachment previews. It cannot meet a requirement to leave original messages and custom user styles untouched. The local test installation has been disabled. See [feasibility and required upstream support](docs/feasibility.md).
+Localized timestamps alongside Paseo user and assistant messages.
 
-Small timestamps for user and assistant messages. Local time, readable text, and room to breathe.
+> **Experimental replacement renderer, not a native footer.** This version uses the public Paseo 0.13.2 Markdown component. It does not guarantee native styling, action or attachment parity. See the [feasibility notes](docs/feasibility.md) for the original API investigation and current scope.
 
 ![Illustrative light and dark preview](assets/preview.svg)
 
-*Illustrative preview with sample messages. Colors follow your Paseo theme.*
+*Illustrative layout, not a product screenshot. Colors follow your Paseo theme.*
 
 ## Try the experimental renderer
 
-Requires **Paseo 0.12.0 or later** on both the daemon and client, with plugins enabled.
+Requires Paseo 0.13.2 or later and enabled plugins:
 
 ```sh
-paseo plugin install git:dasheck0/paseo-timestamps --ref v0.1.1
+paseo plugin install /path/to/paseo-timestamps
 ```
 
-This installs directly from GitHub. The plugin is not listed in Paseo's registry. To remove it: `paseo plugin remove paseo-timestamps`.
+## What to expect
 
-## What you get
+The plugin adds localized date and time labels to both user and assistant messages. Today and yesterday use localized relative labels; other dates use the locale's medium date format. User text remains selectable plain text in a right-aligned, theme-colored bubble. Assistant text is passed unchanged to Paseo's own themed Markdown component, with the host's streaming reveal hook.
 
-- A subtle local date-and-time label below each text message, with the full date available to assistive technology.
-- User bubbles aligned right and assistant replies aligned left, in light, dark, and compact layouts.
-- Original message text and Paseo's paced assistant streaming. History uses the message timestamp supplied by Paseo; invalid dates show no time.
+The public SDK does not expose native message components, so timestamps require replacement message renderers. Consequently, exact native layout and feature parity is not guaranteed: actions, attachments, special content, and streaming presentation can differ. The SDK transformer may not expose attachment metadata, in which case this plugin cannot render those attachments. Invalid timestamps leave the message visible without a timestamp.
 
-Client-only: no backend, credentials, analytics, or additional network requests. Paseo's normal provider traffic is unchanged.
-
-## Before you install
-
-Paseo's timeline API replaces a message instead of decorating its native row. In this minimal version, **Markdown is shown as source text**, and native copy, rewind, and other row actions are unavailable on replaced messages. Text remains selectable.
-
-Empty messages and standalone base64 `data:` payloads stay native. **Mixed text-and-attachment messages can lose their native attachment preview** because the transform API does not expose that metadata. Remove this plugin to restore native rendering; it does not rewrite message history.
-
-The first matching timeline transformer wins. If another plugin, including Chat Polish, already renders assistant replies, turn off its overlapping renderer to see these timestamps. This plugin does not change other plugins' settings.
+Client-only: no backend, credentials, analytics, or additional network requests.
 
 ## Development
 
-Node 22.19.0 and npm 11.13.0 (the same versions used in CI):
-
 ```sh
 npm ci --ignore-scripts
+npm run lint
+npm run build
 npm run typecheck
 npm test
 ```
 
-SDK types are pinned to Paseo 0.12.0. Tests cover transforms, streaming/completion, invalid dates, timezone boundaries, compact and theme variants, and teardown. Rendering tests mock the native primitives and streaming hook; they do not replace device testing.
+## License
 
-GitFlow: `feature/*` → `develop` → `release/*` → `main`, with release tags on `main` and merges back into `develop`.
-
-Built against the [official plugin API](https://paseo.sh/docs/plugins/reference#timeline-items). MIT licensed.
+MIT

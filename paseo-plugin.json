@@ -3,7 +3,7 @@
   "name": "Paseo Timestamps",
   "media": [],
   "requirements": {
-    "paseo": ">=0.12.0"
+    "paseo": ">=0.13.2"
   },
-  "description": "Local timestamps for user and assistant messages, with a compact native text layout."
+  "description": "Localized timestamps alongside user and assistant messages."
 }

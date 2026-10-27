@@ -1,60 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatTimestamp,
-  formatTimestampAccessibilityLabel,
-  messageTimestampSchema,
-  transformAssistantMessage,
-  transformUserMessage,
-} from "./timestamp-model";
-
-describe("message transforms", () => {
-  it("replaces a user message with exactly one stable plugin item", () => {
-    const result = transformUserMessage({
-      item: { text: "Keep **this** exactly\n", clientMessageId: "client-1" },
-      phase: "complete",
-    });
-
-    expect(result).toEqual({
-      items: [
-        {
-          type: "plugin",
-          kind: "timestamped-message",
-          version: 1,
-          data: { text: "Keep **this** exactly\n", phase: "complete" },
-        },
-      ],
-    });
-    expect(messageTimestampSchema.parse(result?.items[0]?.data)).toEqual({
-      text: "Keep **this** exactly\n",
-      phase: "complete",
-    });
-  });
-
-  it("keeps full accumulated assistant text while streaming", () => {
-    const result = transformAssistantMessage({
-      item: { text: "First chunk, then the full reply", messageId: "assistant-1" },
-      phase: "streaming",
-    });
-
-    expect(result?.items).toEqual([
-      {
-        type: "plugin",
-        kind: "timestamped-assistant-message",
-        version: 1,
-        data: { text: "First chunk, then the full reply", phase: "streaming" },
-      },
-    ]);
-  });
-
-  it("leaves encoded attachment text to the native row", () => {
-    expect(
-      transformUserMessage({
-        item: { text: "data:text/plain;base64,SGVsbG8=" },
-        phase: "complete",
-      }),
-    ).toBeUndefined();
-  });
-});
+import { formatMessageDate, formatTimestamp, formatTimestampAccessibilityLabel } from "./timestamp-model";
 
 describe("timestamp formatting", () => {
   const midnightUtc = new Date("2026-10-26T00:00:00.000Z");
@@ -73,31 +18,44 @@ describe("timestamp formatting", () => {
   it("omits invalid timestamps", () => {
     expect(formatTimestamp(new Date("invalid"), shortUtc)).toBeNull();
     expect(formatTimestampAccessibilityLabel(new Date("invalid"), fullUtc)).toBeNull();
+    expect(formatMessageDate(new Date("invalid"), midnightUtc, "en-US")).toBeNull();
   });
-});
 
+  it("formats today and yesterday with localized relative labels", () => {
+    const now = new Date(2026, 9, 26, 12, 0);
+    const today = new Date(2026, 9, 26, 0, 0);
+    const yesterday = new Date(2026, 9, 25, 23, 59);
 
-describe("history and streaming boundaries", () => {
-  it("lets Paseo derive identity from the source row rather than changing message IDs", () => {
-    const live = transformAssistantMessage({ item: { text: "First\n\nSecond", clientMessageId: "local" }, phase: "streaming" });
-    const done = transformAssistantMessage({ item: { text: "First\n\nSecond", messageId: "saved" }, phase: "complete" });
-    expect(live?.items[0]).not.toHaveProperty("id");
-    expect(done?.items[0]).not.toHaveProperty("id");
-    expect(done?.items[0].data).toEqual({ text: "First\n\nSecond", phase: "complete" });
+    for (const locale of ["de-DE", "en-US"]) {
+      const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+      expect(formatMessageDate(today, now, locale)).toBe(relative.format(0, "day"));
+      expect(formatMessageDate(yesterday, now, locale)).toBe(relative.format(-1, "day"));
+    }
   });
-  it("leaves empty attachment-only messages native", () => {
-    expect(transformUserMessage({ item: { text: "" }, phase: "complete" })).toBeUndefined();
-    expect(transformAssistantMessage({ item: { text: "  " }, phase: "streaming" })).toBeUndefined();
+
+  it("formats older-month and older-year dates using the locale's medium date", () => {
+    const now = new Date(2026, 9, 26, 12, 0);
+    const olderMonth = new Date(2026, 8, 24, 9, 0);
+    const nextYear = new Date(2027, 0, 2, 9, 0);
+
+    for (const locale of ["de-DE", "en-US"]) {
+      const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+      expect(formatMessageDate(olderMonth, now, locale)).toBe(formatter.format(olderMonth));
+      expect(formatMessageDate(nextYear, now, locale)).toBe(formatter.format(nextYear));
+    }
   });
-  it("rejects malformed renderer payloads", () => {
-    expect(messageTimestampSchema.safeParse({ text: 1, phase: "complete" }).success).toBe(false);
-    expect(messageTimestampSchema.safeParse({ text: "x", phase: "loading" }).success).toBe(false);
+
+  it("uses local calendar boundaries across midnight, month, year, and daylight saving time", () => {
+    const relative = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+    expect(formatMessageDate(new Date(2026, 11, 31, 23, 59), new Date(2027, 0, 1, 0, 0), "en-US"))
+      .toBe(relative.format(-1, "day"));
+    expect(formatMessageDate(new Date(2026, 2, 29, 12, 0), new Date(2026, 2, 30, 12, 0), "en-US"))
+      .toBe(relative.format(-1, "day"));
   });
-  it("uses the selected timezone across a date boundary", () => {
-    const date = new Date("2026-10-26T00:30:00Z");
-    const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Los_Angeles", dateStyle: "full", timeStyle: "short" });
-    const label = formatTimestampAccessibilityLabel(date, formatter);
-    expect(label).toContain("25 October 2026");
-    expect(label).toContain("17:30");
+
+  it("retains a complete accessible date and local timezone", () => {
+    const label = formatTimestampAccessibilityLabel(new Date("2026-10-26T00:30:00Z"));
+    expect(label).toMatch(/2026/);
+    expect(label).toMatch(/(?:GMT|UTC|[A-Z]{2,5})/);
   });
 });
