@@ -1,7 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { transformMessage } from "./transform";
-
-vi.mock("react-native", () => ({ View: "view", Text: "text" }));
+import { messageReplacementSchema } from "./message-schema";
 
 describe("public timeline transformers", () => {
   it("preserves exact text and uses no fabricated item identity", () => {
@@ -11,6 +10,28 @@ describe("public timeline transformers", () => {
     expect(transformMessage("user")(input)).toEqual(first);
     expect(first?.items[0]).toMatchObject({ kind: "paseo-timestamps-message", data: { role: "user", text, phase: "complete" } });
     expect(first?.items[0]).not.toHaveProperty("id");
+  });
+
+  it.each(["user", "assistant"] as const)("preserves complete %s source in both phases without metadata", (role) => {
+    const text = "  # Heading\n\n```ts\nconst x = 1;\n```\n[link](https://example.test)\n  ";
+    for (const phase of ["streaming", "complete"] as const) {
+      expect(transformMessage(role)({ item: { type: `${role}_message`, text }, phase })?.items[0].data)
+        .toEqual({ role, text, phase });
+    }
+  });
+
+  it.each([
+    { text: " \n\t " },
+    { text: "data:image/png;base64,aGVsbG8=" },
+    { text: "file", images: [] },
+    { text: "file", content: [] },
+    { text: "file", attachments: [] },
+  ])("preserves native handling of exposed rich or empty payloads: %j", (payload) => {
+    expect(transformMessage("user")({ item: { type: "user_message", ...payload } as never, phase: "complete" })).toBeUndefined();
+  });
+
+  it.each([null, {}, { role: "tool", text: "x", phase: "complete" }, { role: "user", text: 1, phase: "complete" }, { role: "assistant", text: "x", phase: "unknown" }])("rejects invalid renderer data %j", (data) => {
+    expect(messageReplacementSchema.safeParse(data).success).toBe(false);
   });
 
   it("carries actual assistant message text and phase transitions", () => {

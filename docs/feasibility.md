@@ -1,27 +1,28 @@
-# Native timestamp footers: feasibility
+# Rendering and API constraints
 
-**Current scope: public SDK 0.13.2 replacement rendering, explicitly accepted as a trade-off. Exact native-message preservation remains blocked by the public API.**
+## Current implementation
 
-The current version renders assistant content through the public host Markdown component and user content as selectable plain text in a theme-colored bubble. It requires no client patch. Native actions, attachment previews and exact styles are not guaranteed. Lint, TypeScript compilation, typecheck and 13 tests pass. The notes below describe the earlier SDK 0.12 investigation, not the current dependency versions or runtime installation status.
+The plugin uses the **published Paseo SDK 0.13.2**: `addTimelineTransformer`, `addTimelineRenderer`, the host `Markdown` component, and `useRevealedText`. It requires no client patch, private app import, or DOM modification.
 
-The intended behavior is to keep Paseo's original user and assistant message rendering, custom styles, Markdown, attachments and actions intact, adding only a localized date and time below it. Dates should use the user's locale and local calendar: today, yesterday, or a formatted date.
+A transformer returns plugin rows that replace the source message. Returning `undefined` leaves the original native row in place. The renderer receives the source `timestamp: Date` from the host; the plugin never creates a substitute timestamp.
 
-## Evidence
+Assistant text goes through the host's Markdown renderer and reveal hook. User text remains selectable plain text in a right-aligned, theme-colored bubble. Source text is not rewritten or persisted by the plugin.
 
-The installed `@getpaseo/plugin` 0.12.0 types provide `addTimelineTransformer` and `addTimelineRenderer`. A renderer receives the source `timestamp: Date`. A transformer either returns `undefined` to keep a native message or returns plugin items that replace it. It cannot return the original native row alongside a footer. There is no native-message render callback or message-footer registration in the checked API.
+## Deliberate limitations
 
-The current official source confirms the [replacement-only transform result](https://github.com/getpaseo/paseo/blob/e3bbed3c73fac7cbd2b5e340037ff6a9201206b8/packages/plugin/src/contracts.ts) and [host timeline projection](https://github.com/getpaseo/paseo/blob/e3bbed3c73fac7cbd2b5e340037ff6a9201206b8/packages/app/src/plugins/timeline/projection.ts). See also the [official timeline API reference](https://paseo.sh/docs/plugins/reference#timeline-items).
+- The public SDK does not export native `UserMessage` / `AssistantMessage` components or a native-message footer slot. Rebuilding a row does not preserve every native style, font setting, action, or attachment feature.
+- Native copy/rewind actions are not recreated. Text selection is not equivalent to retaining all row actions.
+- Attachment/image metadata may be omitted from transformer input. Exposed unsupported payloads can be left native, but a mixed text-and-attachment row without that metadata cannot be detected reliably. Its attachment previews can be lost.
+- User-bubble styling uses the subset of theme colors exposed to plugins. Exact matching to native or custom styles is not guaranteed.
+- Another matching timeline transformer may take precedence.
+- Relative day labels are calculated when rendered; an idle view is not guaranteed to update automatically at midnight.
 
-Paseo 0.12 does not export a host Markdown component to plugins. Newer documentation describes one, but rendering Markdown alone still would not preserve all native message styles, attachments and actions. Rebuilding native messages is not equivalent to decorating them.
+If complete native behavior is required, leave the plugin off. Removing it restores the host renderer without changing conversation history.
 
-## What was verified
+## Earlier investigation
 
-The prototype typechecks against SDK 0.12.0 and passes 15 tests covering transforms, streaming/completion forwarding, timestamp formatting, invalid dates, timezone boundaries, mocked native rendering and teardown. It loaded successfully in Paseo and displayed timestamps on both roles. Source and Git history were scanned with Gitleaks without findings.
+SDK 0.12 did not export a public Markdown component. A local footer API was prototyped in a separate Paseo checkout, but it is **not used or required by this plugin** and is not part of the published SDK. Updating Paseo alone does not make that experimental API public.
 
-Those results verify the prototype. They do not satisfy the native-rendering acceptance requirement. The plugin was disabled after that requirement was established. No message history is rewritten by the plugin; disabling it restores native rendering.
+Supporting a true native footer would require an official host extension. The current distributable deliberately uses the supported replacement API instead.
 
-## What is needed
-
-Paseo must expose a supported footer or decoration slot around its existing message renderer. The host should retain ownership of the original body and actions and pass the source timestamp, role, locale and layout to the footer contribution. Localized calendar dates can then be added without replacing the message.
-
-No DOM patch or private app import is included as a workaround. No upstream issue or pull request has been submitted on the user's behalf.
+Reference: [official plugin timeline API](https://paseo.sh/docs/plugins/reference#timeline-items). Public SDK declarations are the compatibility baseline; newer documentation may describe APIs absent from older releases.

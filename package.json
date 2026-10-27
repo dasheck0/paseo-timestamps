@@ -1,6 +1,6 @@
 {
   "name": "@dasheck0/paseo-timestamps",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Compact, local timestamps for Paseo user and assistant timeline messages.",
   "license": "MIT",
   "repository": {
@@ -16,18 +16,24 @@
     "OVERVIEW.md",
     "README.md",
     "LICENSE",
+    "CHANGELOG.md",
     "index.client.tsx",
     "client/transform.ts",
+    "client/message-schema.ts",
     "client/timestamp-model.ts",
     "client/timestamps.tsx",
-    "assets/",
-    "docs/"
+    "assets/logo.png",
+    "assets/preview.svg",
+    "docs/feasibility.md",
+    "docs/releasing.md"
   ],
   "scripts": {
     "lint": "eslint . --max-warnings=0",
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:package": "node scripts/check-package.mjs",
+    "check": "npm run lint && npm run build && npm run typecheck && npm test && npm run check:package"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
@@ -49,5 +55,5 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "npm@11.13.0"
+  "packageManager": "npm@11.17.0"
 }

@@ -4,27 +4,42 @@
 
 # Paseo Timestamps
 
-Localized timestamps alongside Paseo user and assistant messages.
+Small timestamps. Local dates. A clearer conversation.
 
-> **Experimental replacement renderer, not a native footer.** This version uses the public Paseo 0.13.2 Markdown component. It does not guarantee native styling, action or attachment parity. See the [feasibility notes](docs/feasibility.md) for the original API investigation and current scope.
+Adds local date and time labels to user and assistant messages, with rendered assistant Markdown and colors from your Paseo theme. No account, backend, or patched client required.
 
 ![Illustrative light and dark preview](assets/preview.svg)
 
 *Illustrative layout, not a product screenshot. Colors follow your Paseo theme.*
 
-## Try the experimental renderer
+## Install
 
-Requires Paseo 0.13.2 or later and enabled plugins:
+Requires **Paseo 0.13.2 or later on both client and daemon**, with plugins enabled.
 
 ```sh
-paseo plugin install /path/to/paseo-timestamps
+paseo plugin install git:dasheck0/paseo-timestamps --ref v1.0.0
 ```
 
-## What to expect
+For unreleased changes, use `--ref develop` instead. See the [release checklist](docs/releasing.md). To remove the plugin:
 
-The plugin adds localized date and time labels to both user and assistant messages. Today and yesterday use localized relative labels; other dates use the locale's medium date format. User text remains selectable plain text in a right-aligned, theme-colored bubble. Assistant text is passed unchanged to Paseo's own themed Markdown component, with the host's streaming reveal hook.
+```sh
+paseo plugin remove paseo-timestamps
+```
 
-The public SDK does not expose native message components, so timestamps require replacement message renderers. Consequently, exact native layout and feature parity is not guaranteed: actions, attachments, special content, and streaming presentation can differ. The SDK transformer may not expose attachment metadata, in which case this plugin cannot render those attachments. Invalid timestamps leave the message visible without a timestamp.
+## What you get
+
+- **Local dates:** localized “today” / “yesterday”; otherwise your locale's date format, followed by local time.
+- **Truthful timestamps:** uses the source date supplied by Paseo, including history. Invalid dates hide only the label.
+- **Distinct messages:** selectable user text in a right-aligned bubble; assistant content through Paseo's themed Markdown renderer and streaming reveal hook.
+- **Accessible labels:** the complete date, time, and timezone name supplied by the platform.
+
+## Know before installing
+
+**This plugin replaces message rows; it does not decorate the native renderer.** Exact native/custom styling, copy/rewind actions, and streaming presentation are not guaranteed. Native row actions are not recreated. User bubbles use the theme values available to plugins, not every native style setting.
+
+Attachment-bearing or special messages stay native when recognizable. **Paseo can omit attachment metadata from the transformer input, so mixed text-and-attachment messages can lose their previews.** If attachments or complete native feature parity are essential, do not enable this renderer. Removing it restores native rendering without rewriting message history.
+
+Other plugins that transform the same messages can take precedence. This plugin does not change their settings. See [API constraints](docs/feasibility.md) for details.
 
 Client-only: no backend, credentials, analytics, or additional network requests.
 
@@ -36,7 +51,14 @@ npm run lint
 npm run build
 npm run typecheck
 npm test
+npm run check:package
 ```
+
+Node 22+ is required for development. `build` compiles the client TypeScript; Paseo bundles the published TypeScript entry point when loading the plugin. Installs intentionally skip lifecycle scripts. Tests mock host components and do not replace device testing.
+
+Local installation: `paseo plugin install /path/to/paseo-timestamps`.
+
+See [release preparation](docs/releasing.md) and the [changelog](CHANGELOG.md).
 
 ## License
 

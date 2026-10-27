@@ -1,8 +1,15 @@
-export function formatTimestamp(timestamp: Date, formatter = new Intl.DateTimeFormat(undefined, { timeStyle: "short" })) {
+export function formatTimestamp(
+  timestamp: Date,
+  formatter = new Intl.DateTimeFormat(undefined, { timeStyle: "short" }),
+) {
   return Number.isNaN(timestamp.getTime()) ? null : formatter.format(timestamp);
 }
 
-export function formatMessageDate(timestamp: Date, now = new Date(), locale?: string) {
+export function formatMessageDate(
+  timestamp: Date,
+  now = new Date(),
+  locale?: string,
+) {
   if (Number.isNaN(timestamp.getTime())) return null;
 
   const isSameLocalDate = (left: Date, right: Date) =>

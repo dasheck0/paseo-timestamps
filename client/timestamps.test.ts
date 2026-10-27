@@ -58,4 +58,19 @@ describe("timestamp formatting", () => {
     expect(label).toMatch(/2026/);
     expect(label).toMatch(/(?:GMT|UTC|[A-Z]{2,5})/);
   });
+
+  it("uses the default locale for calendar-relative labels", () => {
+    const now = new Date(2026, 9, 26, 0, 1);
+    const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    expect(formatMessageDate(now, now)).toBe(relative.format(0, "day"));
+    expect(formatMessageDate(new Date(2026, 9, 25, 23, 59), now)).toBe(relative.format(-1, "day"));
+  });
+
+  it.each([
+    [2026, 2, 9], [2026, 2, 30], [2026, 9, 26], [2026, 10, 2],
+  ])("uses yesterday across spring/fall DST boundaries %j-%j-%j", (year, month, day) => {
+    const now = new Date(year, month, day, 0, 1);
+    const yesterday = new Date(year, month, day - 1, 0, 0);
+    expect(formatMessageDate(yesterday, now, "en-US")).toBe("yesterday");
+  });
 });
