@@ -8,6 +8,8 @@ Small timestamps. Local dates. A clearer conversation.
 
 Adds local date and time labels to user and assistant messages, with rendered assistant Markdown and colors from your Paseo theme. No account or additional service required.
 
+![Light and dark timestamp preview](assets/preview.svg)
+
 ## Install
 
 Requires **Paseo 0.13.2 or later on both client and daemon**, with plugins enabled.
