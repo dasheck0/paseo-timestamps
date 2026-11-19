@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { formatMessageDate, formatTimestamp, formatTimestampAccessibilityLabel } from "./timestamp-model";
 
 describe("timestamp formatting", () => {
@@ -72,5 +72,18 @@ describe("timestamp formatting", () => {
     const now = new Date(year, month, day, 0, 1);
     const yesterday = new Date(year, month, day - 1, 0, 0);
     expect(formatMessageDate(yesterday, now, "en-US")).toBe("yesterday");
+  });
+
+  describe("when Intl.RelativeTimeFormat is unavailable (e.g. Hermes on mobile)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("falls back to plain today/yesterday labels instead of throwing", () => {
+      vi.stubGlobal("Intl", { ...Intl, RelativeTimeFormat: undefined });
+      const now = new Date(2026, 9, 26, 12, 0);
+      expect(formatMessageDate(now, now, "en-US")).toBe("Today");
+      expect(formatMessageDate(new Date(2026, 9, 25, 12, 0), now, "en-US")).toBe("Yesterday");
+    });
   });
 });

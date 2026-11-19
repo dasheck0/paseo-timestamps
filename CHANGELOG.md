@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix the plugin crashing on clients whose JS engine lacks `Intl.RelativeTimeFormat` (e.g. the Paseo mobile app), which hid every message. Fall back to plain "Today"/"Yesterday" labels and guard medium-date formatting.
+
 ## 1.0.0 — 2026-10-27
 
 - Require the public Paseo SDK 0.13.2.
